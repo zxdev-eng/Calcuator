@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Everyday Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #111;
+      --fg: #ccc;
+      --accent: #43a047;
+      --btn-bg: #2e2e2e;
+      --btn-hover: #444;
+      --display-bg: #000;
+      --display-color: #a6f9a6;
+    }
+
+    [data-theme="light"] {
+      --bg: #f4f4f4;
+      --fg: #222;
+      --accent: #2e7d32;
+      --btn-bg: #fff;
+      --btn-hover: #ddd;
+      --display-bg: #e0ffe0;
+      --display-color: #004d00;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--fg);
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Orbitron', sans-serif;
+      transition: background 0.3s ease;
+    }
+
+    .calculator {
+      background: var(--btn-bg);
+      border-radius: 20px;
+      padding: 25px;
+      width: 90%;
+      max-width: 360px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    }
+
+    #display {
+      width: 100%;
+      height: 60px;
+      font-size: 2em;
+      text-align: right;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 10px;
+      background-color: var(--display-bg);
+      color: var(--display-color);
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    button {
+      height: 60px;
+      font-size: 1.4em;
+      border: none;
+      border-radius: 12px;
+      background-color: var(--btn-bg);
+      color: var(--fg);
+      box-shadow: 0 4px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      transition: all 0.1s ease-in-out;
+    }
+
+    button:hover {
+      background-color: var(--btn-hover);
+    }
+
+    button:active {
+      box-shadow: 0 2px rgba(0, 0, 0, 0.4);
+      transform: translateY(2px);
+    }
+
+    .operator {
+      background: var(--accent);
+      color: white;
+    }
+
+    .equal {
+      background: #00c853;
+      color: white;
+      grid-column: span 2;
+    }
+
+    .clear {
+      background: #d32f2f;
+      color: white;
+    }
+
+    .backspace {
+      background: #1976d2;
+      color: white;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .theme-toggle {
+      background: transparent;
+      color: var(--fg);
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    @media (max-width: 480px) {
+      #display {
+        font-size: 1.6em;
+      }
+
+      button {
+        font-size: 1.2em;
+        height: 55px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="calculator" id="calc-app">
+    <div class="topbar">
+      <h2 style="margin: 0;">Calculator</h2>
+      <button class="theme-toggle" onclick="toggleTheme()">☀️/🌙</button>
+    </div>
+    <input type="text" id="display" readonly onclick="copyToClipboard()" placeholder="0" />
+    <div class="buttons">
+      <button class="clear" onclick="clearDisplay()">C</button>
+      <button class="backspace" onclick="backspace()">⌫</button>
+      <button class="operator" onclick="appendValue('/')">÷</button>
+      <button class="operator" onclick="appendValue('*')">×</button>
+
+      <button onclick="appendValue('7')">7</button>
+      <button onclick="appendValue('8')">8</button>
+      <button onclick="appendValue('9')">9</button>
+      <button class="operator" onclick="appendValue('-')">−</button>
+
+      <button onclick="appendValue('4')">4</button>
+      <button onclick="appendValue('5')">5</button>
+      <button onclick="appendValue('6')">6</button>
+      <button class="operator" onclick="appendValue('+')">+</button>
+
+      <button onclick="appendValue('1')">1</button>
+      <button onclick="appendValue('2')">2</button>
+      <button onclick="appendValue('3')">3</button>
+      <button class="equal" onclick="calculate()">=</button>
+
+      <button onclick="appendValue('0')">0</button>
+      <button onclick="appendValue('.')">.</button>
+    </div>
+  </div>
+
+  <script>
+    const display = document.getElementById('display');
+    const calculator = document.getElementById('calc-app');
+    let currentTheme = localStorage.getItem('theme') || 'dark';
+
+    document.body.setAttribute('data-theme', currentTheme);
+
+    function appendValue(value) {
+      display.value += value;
+    }
+
+    function clearDisplay() {
+      display.value = '';
+    }
+
+    function backspace() {
+      display.value = display.value.slice(0, -1);
+    }
+
+    function calculate() {
+      try {
+        display.value = eval(display.value);
+      } catch {
+        display.value = 'Error';
+      }
+    }
+
+    function toggleTheme() {
+      currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+      document.body.setAttribute('data-theme', currentTheme);
+      localStorage.setItem('theme', currentTheme);
+    }
+
+    function copyToClipboard() {
+      if (display.value.trim() !== '') {
+        navigator.clipboard.writeText(display.value);
+        alert("Copied: " + display.value);
+      }
+    }
+
+    // Keyboard support
+    document.addEventListener('keydown', (event) => {
+      const key = event.key;
+      if (/[\d+\-*/.]/.test(key)) appendValue(key);
+      else if (key === 'Enter') calculate();
+      else if (key === 'Backspace') backspace();
+      else if (key === 'Escape') clearDisplay();
+    });
+
+    // Autofocus on load
+    window.onload = () => {
+      display.focus();
+    };
+  </script>
+
+</body>
+</html>
